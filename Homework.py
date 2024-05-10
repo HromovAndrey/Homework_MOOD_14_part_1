@@ -1,74 +1,41 @@
-# Завдання 2
-# Користувач вводить з клавіатури шлях до файлу. Після
-# чого запускаються три потоки. Перший потік заповнює файл
-# випадковими числами. Два інші потоки очікують на заповнення. Коли файл заповнений, обидва потоки стартують.
-# Перший потік знаходить усі прості числа, другий потік знаходить факторіал кожного числа у файлі. Результати пошуку
-# кожен потік має записати у новий файл. Виведіть на екран
-# статистику виконаних операцій.
+# Завдання 3
+# Користувач вводить з клавіатури шлях до існуючої та
+# до нової директорії. Після чого запускається потік, який має
+# скопіювати вміст директорії у нове місце. Збережіть структуру
+# директорії. Виведіть статистику виконаних операцій на екран
 
+import os
 import threading
-import random
-import math
 
-def fill_file_with_random_numbers(file_path):
-    with open(file_path, 'w') as file:
-        for _ in range(10):
-            file.write(str(random.randint(1, 100)) + '\n')
+def copy_directory_contents(source_dir, dest_dir):
+    try:
+        if not os.path.exists(dest_dir):
+            os.makedirs(dest_dir)
 
-def is_prime(n):
-    if n <= 1:
-        return False
-    for i in range(2, int(math.sqrt(n)) + 1):
-        if n % i == 0:
-            return False
-    return True
+        for item in os.listdir(source_dir):
+            source_item = os.path.join(source_dir, item)
+            dest_item = os.path.join(dest_dir, item)
+            if os.path.isdir(source_item):
+                copy_directory_contents(source_item, dest_item)
+            else:
+                with open(source_item, 'rb') as source_file:
+                    with open(dest_item, 'wb') as dest_file:
+                        dest_file.write(source_file.read())
 
-def find_primes(file_path):
-    primes = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            number = int(line.strip())
-            if is_prime(number):
-                primes.append(number)
-    return primes
+        print(f"Директорія {source_dir} успішно скопійована в {dest_dir}")
+    except Exception as e:
+        print(f"Під час копіювання виникла помилка: {e}")
 
-def factorial(n):
-    if n == 0:
-        return 1
-    return n * factorial(n-1)
-
-def find_factorials(file_path):
-    factorials = []
-    with open(file_path, 'r') as file:
-        for line in file:
-            number = int(line.strip())
-            factorials.append(factorial(number))
-    return factorials
 
 def main():
+    source_dir = input("Введіть шлях до існуючої директорії: ")
+    dest_dir = input("Введіть шлях до нової директорії: ")
+    copy_thread = threading.Thread(target=copy_directory_contents, args=(source_dir, dest_dir))
+    copy_thread.start()
+    copy_thread.join()
 
-    file_path = input("Введіть шлях до файлу: ")
-    fill_thread = threading.Thread(target=fill_file_with_random_numbers, args=(file_path,))
-    fill_thread.start()
-    fill_thread.join()
-    primes_thread = threading.Thread(target=find_primes, args=(file_path,))
-    factorials_thread = threading.Thread(target=find_factorials, args=(file_path,))
-    primes_thread.start()
-    factorials_thread.start()
-    primes_thread.join()
-    factorials_thread.join()
-    primes = primes_thread.result()
-    factorials = factorials_thread.result()
-    with open("primes.txt", 'w') as primes_file:
-        for prime in primes:
-            primes_file.write(str(prime) + '\n')
+    print("Копіювання завершено.")
 
-    with open("factorials.txt", 'w') as factorials_file:
-        for factorial_num in factorials:
-            factorials_file.write(str(factorial_num) + '\n')
-
-    print("Кількість знайдених простих чисел:", len(primes))
-    print("Кількість обчислених факторіалів:", len(factorials))
 
 if __name__ == "__main__":
     main()
