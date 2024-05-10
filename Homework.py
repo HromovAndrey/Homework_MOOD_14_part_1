@@ -7,7 +7,9 @@
 
 import os
 import threading
-
+source_dir = input("Введіть шлях до директорії: ")
+search_word = input("Введіть слово для пошуку: ")
+banned_words_file = input("Введіть шлях до файлу зі збороненими словами: ")
 def search_and_merge_files(source_dir, search_word, output_file):
     try:
         matching_files = []
@@ -45,20 +47,13 @@ def exclude_banned_words(input_file, banned_words_file, output_file):
     except Exception as e:
         print(f"Під час виключення заборонених слів виникла помилка: {e}")
 
-def main():
-    source_dir = input("Введіть шлях до директорії: ")
-    search_word = input("Введіть слово для пошуку: ")
-    banned_words_file = input("Введіть шлях до файлу зі збороненими словами: ")
+merged_file = 'merged_files.txt'
+modified_file = 'modified_file.txt'
+search_thread = threading.Thread(target=search_and_merge_files, args=(source_dir, search_word, merged_file))
+search_thread.start()
+search_thread.join()
+exclude_thread = threading.Thread(target=exclude_banned_words, args=(merged_file, banned_words_file, modified_file))
+exclude_thread.start()
+exclude_thread.join()
+print("Операції завершено.")
 
-    merged_file = 'merged_files.txt'
-    modified_file = 'modified_file.txt'
-    search_thread = threading.Thread(target=search_and_merge_files, args=(source_dir, search_word, merged_file))
-    search_thread.start()
-    search_thread.join()
-    exclude_thread = threading.Thread(target=exclude_banned_words, args=(merged_file, banned_words_file, modified_file))
-    exclude_thread.start()
-    exclude_thread.join()
-    print("Операції завершено.")
-
-if __name__ == "__main__":
-    main()
