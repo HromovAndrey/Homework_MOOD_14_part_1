@@ -15,13 +15,13 @@ def search_and_merge_files(source_dir, search_word, output_file):
             for file in files:
                 file_path = os.path.join(root, file)
                 if os.path.isfile(file_path):
-                    with open(file_path, 'r') as f:
-                        if search_word in f.read():
+                    with open(file_path, 'r') as file:
+                        if search_word in file.read():
                             matching_files.append(file_path)
-        with open(output_file, 'w') as out_f:
+        with open(output_file, 'w') as out_file:
             for file_path in matching_files:
-                with open(file_path, 'r') as in_f:
-                    out_f.write(in_f.read() + '\n')
+                with open(file_path, 'r') as in_file:
+                    out_file.write(in_file.read() + '\n')
 
         print(f"Знайдено та злито {len(matching_files)} файлів з потрібним словом.")
     except Exception as e:
