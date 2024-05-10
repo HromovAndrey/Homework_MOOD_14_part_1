@@ -9,6 +9,7 @@
 
 import threading
 import random
+numbers = []
 
 def fill_random_numbers(nums):
     for _ in range(10):
@@ -24,20 +25,18 @@ def find_average(nums):
     else:
         print("Список пустий.")
 
-def main():
-    numbers = []
-    fill_thread = threading.Thread(target=fill_random_numbers, args=(numbers,))
-    sum_thread = threading.Thread(target=find_sum, args=(numbers,))
-    average_thread = threading.Thread(target=find_average, args=(numbers,))
-    fill_thread.start()
-    fill_thread.join()
-    sum_thread.start()
-    average_thread.start()
-    sum_thread.join()
-    average_thread.join()
 
-if __name__ == "__main__":
-    main()
+
+fill_thread = threading.Thread(target=fill_random_numbers, args=(numbers,))
+sum_thread = threading.Thread(target=find_sum, args=(numbers,))
+average_thread = threading.Thread(target=find_average, args=(numbers,))
+fill_thread.start()
+fill_thread.join()
+sum_thread.start()
+average_thread.start()
+sum_thread.join()
+average_thread.join()
+
 
 
 
